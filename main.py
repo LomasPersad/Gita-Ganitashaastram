@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+
 # modified from https://www.datacamp.com/community/tutorials/amazon-web-scraping-using-beautifulsoup
 # https://bhagavad-gita.org/
 # https://jovian.ai/vedant-madane/autosummarize-rulebased
@@ -19,6 +23,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import pickle
+import json
 
 #testing!!
 
@@ -164,13 +169,16 @@ sanskrit = []
 transliteration = []
 translation = []
 
-for i in range(1, 19):
+df = pd.DataFrame(columns=['Sans', 'Translation'])
+
+
+for i in range(1, 2): #chapters
     base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
     print(base_url)
     urls = get_urls(base_url)
 
     with requests.Session() as session:
-        for U in urls:
+        for U in urls: #verses
             response = session.get(U)
             soup = BeautifulSoup(response.content, 'html.parser')
             processed_verse = soup.find('span', attrs={'class': 'verseShort'}).text
@@ -186,40 +194,50 @@ for i in range(1, 19):
                 sanskrit.append(verse_sans)
                 transliteration.append(verse_transliteration)
                 translation.append(final_translation)
+                df.at[U , 'Sans'] = verse_sans
+                df.at[U , 'Translation'] = final_translation
+
 
             # print('testing')
             # print(U)
 
+my_json_sans = json.dumps(sanskrit, ensure_ascii=False).encode('utf8')
+my_json_translit = json.dumps(transliteration, ensure_ascii=False).encode('utf8')
+#print(my_json)
+
 # create a binary pickle file
 f = open("meaning.pkl", "wb")
 # write the python object (dict) to pickle file
-pickle.dump(Bigdata, f)
+pickle.dump(Bigdata, f, pickle.HIGHEST_PROTOCOL)
 # close file
 f.close()
 
 f = open("Sans.pkl", "wb")
 # write the python object (dict) to pickle file
-pickle.dump(sanskrit, f)
+pickle.dump(my_json_sans, f, pickle.HIGHEST_PROTOCOL)
 # close file
 f.close()
 
 f = open("transliteration.pkl", "wb")
 # write the python object (dict) to pickle file
-pickle.dump(transliteration, f)
+pickle.dump(my_json_translit, f, pickle.HIGHEST_PROTOCOL)
 # close file
 f.close()
 
 f = open("translation.pkl", "wb")
 # write the python object (dict) to pickle file
-pickle.dump(translation, f)
+pickle.dump(translation, f, pickle.HIGHEST_PROTOCOL)
 # close file
 f.close()
 
 
 # Creating the DataFrame
+"""
 df = pd.DataFrame([sanskrit, transliteration, translation], columns=['Sans', 'Translit', 'Translation'])
 # Exporting the DataFrame as csv
 df.to_csv('BG.csv', index=False, sep=';')
+"""
+
 """
 Bigdata=[]
 for i in range(1,4):
