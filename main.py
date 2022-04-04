@@ -6,16 +6,16 @@
 # https://github.com/kodematrix/Sentiment-Analysis
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+#import numpy as np
+#import matplotlib.pyplot as plt
+#import seaborn as sns
 
-import re
-import time
-from datetime import datetime
-import matplotlib.dates as mdates
-import matplotlib.ticker as ticker
-from urllib.request import urlopen
+#import re
+#import time
+#from datetime import datetime
+#import matplotlib.dates as mdates
+#import matplotlib.ticker as ticker
+#from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
 import pickle
