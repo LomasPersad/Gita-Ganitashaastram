@@ -27,7 +27,9 @@ import json
 
 #testing!!
 
-def get_data(selected_Url):
+def get_data( selected_Url,Big_df):
+    #Big_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
+
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0",
                "Accept-Encoding": "gzip, deflate",
                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT": "1",
@@ -64,6 +66,11 @@ def get_data(selected_Url):
     # Translation2.find("div",attrs={'class': 'verseShort'}).next_sibling
     final_translation = Translation2.find('span').next_sibling.strip()
     # s2.unwrap()
+
+     # save in dataframe
+    Big_df.at['Sans'] = [sans_Speaker+ verse_sans[0]+verse_sans[1]]
+    Big_df.at['Translation'] = final_translation
+     
 
 
     # print(sans_Speaker+ ':\n')
@@ -169,7 +176,7 @@ sanskrit = []
 transliteration = []
 translation = []
 
-df = pd.DataFrame(columns=['Sans', 'Translation'])
+Big_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
 
 
 for i in range(1, 2): #chapters
@@ -189,13 +196,13 @@ for i in range(1, 2): #chapters
             else:
                 smallverse.append(processed_verse)
                 # Sans_meaning = get_data(U)[0]
-                Sans_meaning, verse_sans, verse_transliteration, final_translation = get_data(U)
+                Sans_meaning, verse_sans, verse_transliteration, final_translation = get_data(U,Big_df)
                 Bigdata.append(Sans_meaning)
                 sanskrit.append(verse_sans)
                 transliteration.append(verse_transliteration)
                 translation.append(final_translation)
-                df.at[U , 'Sans'] = verse_sans
-                df.at[U , 'Translation'] = final_translation
+                #df.at[U , 'Sans'] = verse_sans
+                #df.at[U , 'Translation'] = final_translation
 
 
             # print('testing')
