@@ -28,7 +28,7 @@ import json
 #testing!!
 
 def get_data( selected_Url,Big_df):
-    #Big_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
+    small_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
 
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0",
                "Accept-Encoding": "gzip, deflate",
@@ -68,9 +68,9 @@ def get_data( selected_Url,Big_df):
     # s2.unwrap()
 
      # save in dataframe
-    Big_df.at['Sans'] = [sans_Speaker+ verse_sans[0]+verse_sans[1]]
-    Big_df.at['Translation'] = final_translation
-     
+    small_df['Sans'] = [sans_Speaker+ verse_sans[0]+verse_sans[1]]
+    small_df['Translation'] = final_translation
+    small_df['Translit'] = [Speaker+ verse_transliteration[0]+verse_transliteration[1]]
 
 
     # print(sans_Speaker+ ':\n')
@@ -80,8 +80,8 @@ def get_data( selected_Url,Big_df):
     # print(final_translation)
     # print(Sans_meaning)
 
-    return Sans_meaning, verse_sans, verse_transliteration, final_translation
-
+    #return Sans_meaning, verse_sans, verse_transliteration, final_translation
+    return Sans_meaning, small_df
 
 def get_transliteration(Transliteration):
     # Transliteration.get_text() #works but text lines lost
@@ -93,7 +93,7 @@ def get_transliteration(Transliteration):
     sp = []  # speaker
 
     if ((num_ele - 2) % 2) == 0:
-        sp = ''
+        sp = 'none'
         for i in range(0, (num_ele - 1)):
             tmp.append(ele[i])
     else:
@@ -185,7 +185,7 @@ for i in range(1, 2): #chapters
     urls = get_urls(base_url)
 
     with requests.Session() as session:
-        for U in urls: #verses
+        for idx, U in enumerate(urls): #verses 
             response = session.get(U)
             soup = BeautifulSoup(response.content, 'html.parser')
             processed_verse = soup.find('span', attrs={'class': 'verseShort'}).text
@@ -195,19 +195,30 @@ for i in range(1, 2): #chapters
                 continue
             else:
                 smallverse.append(processed_verse)
-                # Sans_meaning = get_data(U)[0]
+                """
+                 # Sans_meaning = get_data(U)[0]
                 Sans_meaning, verse_sans, verse_transliteration, final_translation = get_data(U,Big_df)
                 Bigdata.append(Sans_meaning)
                 sanskrit.append(verse_sans)
                 transliteration.append(verse_transliteration)
                 translation.append(final_translation)
-                #df.at[U , 'Sans'] = verse_sans
-                #df.at[U , 'Translation'] = final_translation
+                
+                """                
+                Sans_meaning, small_df= get_data(U,Big_df)
+
+                save_idx='chpt{}V{}'.format(i,idx+1)
+
+                Big_df.at[save_idx, 'Sans'] = small_df['Sans'][0] 
+                Big_df.at[save_idx , 'Translation'] = small_df['Translation'][0]
+                Big_df.at[save_idx , 'Translit'] = small_df['Translit'][0]              
 
 
             # print('testing')
             # print(U)
 
+Big_df.to_csv('BG.csv', index=False, sep=';')
+
+"""
 my_json_sans = json.dumps(sanskrit, ensure_ascii=False).encode('utf8')
 my_json_translit = json.dumps(transliteration, ensure_ascii=False).encode('utf8')
 #print(my_json)
@@ -236,6 +247,7 @@ f = open("translation.pkl", "wb")
 pickle.dump(translation, f, pickle.HIGHEST_PROTOCOL)
 # close file
 f.close()
+"""
 
 
 # Creating the DataFrame
