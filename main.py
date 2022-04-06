@@ -55,8 +55,8 @@ def get_data( selected_Url,Big_df):
     # sparse sanskrit verse
     Transliteration = d.find('div', attrs={'id': 'transliteration'})
     # Sparse transliteration
-    Speaker, verse_transliteration = get_transliteration(Transliteration)
-    sans_Speaker, verse_sans = get_transliteration(Verse_san)
+    Translit_verse = get_transliteration(Transliteration)
+    Sans_verses = get_transliteration(Verse_san)
 
     # Get translation
     # Translation1=soup.select('div#translation')
@@ -68,9 +68,9 @@ def get_data( selected_Url,Big_df):
     # s2.unwrap()
 
      # save in dataframe
-    small_df['Sans'] = [sans_Speaker+ verse_sans[0]+verse_sans[1]]
+    small_df['Sans'] = [Sans_verses]
     small_df['Translation'] = final_translation
-    small_df['Translit'] = [Speaker+ verse_transliteration[0]+verse_transliteration[1]]
+    small_df['Translit'] = [Translit_verse]
 
 
     # print(sans_Speaker+ ':\n')
@@ -83,6 +83,7 @@ def get_data( selected_Url,Big_df):
     #return Sans_meaning, verse_sans, verse_transliteration, final_translation
     return Sans_meaning, small_df
 
+"""
 def get_transliteration(Transliteration):
     # Transliteration.get_text() #works but text lines lost
     ele = Transliteration.find_all(text=True)  # splits into each part
@@ -94,7 +95,7 @@ def get_transliteration(Transliteration):
 
     if ((num_ele - 2) % 2) == 0:
         sp = 'none'
-        for i in range(0, (num_ele - 1)):
+        for i in range(0, num_ele):
             tmp.append(ele[i])
     else:
         sp = ele[0]
@@ -102,6 +103,43 @@ def get_transliteration(Transliteration):
             tmp.append(ele[i])
 
     return sp, tmp
+
+
+"""
+
+def get_transliteration(Transliteration):
+    # Transliteration.get_text() #works but text lines lost
+    ele = Transliteration.find_all(text=True)  # splits into each part
+    del ele[:1]
+    del ele[-1:]
+    num_ele = len(ele)
+    #tmp = []  # verse
+    #sp = []  # speaker
+    sans=[]
+
+    if num_ele>3:
+        if ((num_ele - 2) % 2) == 0: #if even number of verses
+            kk = 0
+            for i in range(0, num_ele-1):
+                if i % 2 == 0:
+                    tmp=[ele[i]+ ' | '+ ele[i+1]   ]
+                    sans.append(tmp)
+                    kk += 1
+        else: #if odd number of verses then one is speaker!
+             sans[0] = [ele[0] + ele[1] + ele[2]]
+             kk = 1
+             for i in range(3, (num_ele)):
+                if i % 2 != 0:
+                    sans[kk] = [ele[i] + ele[i + 1]]
+                    kk += 1
+    else: # for cases V1-3
+        if ((num_ele - 2) % 2) == 0:
+            sans = [ele[0] + ele[1]]
+        else:
+            sans=[ele[0]+ele[1]+ele[2]]
+
+
+    return sans
 
 
 def Get_sans_meaning(soup):
@@ -178,39 +216,39 @@ translation = []
 
 Big_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
 
+with requests.Session() as session:
+    for i in range(1, 2): #chapters
+            base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
+            #print(base_url)
+            urls = get_urls(base_url)
 
-for i in range(1, 2): #chapters
-    base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
-    print(base_url)
-    urls = get_urls(base_url)
+            for idx, U in enumerate(urls): #verses
+                print(U)
+                response = session.get(U)
+                soup = BeautifulSoup(response.content, 'html.parser')
+                processed_verse = soup.find('span', attrs={'class': 'verseShort'}).text
 
-    with requests.Session() as session:
-        for idx, U in enumerate(urls): #verses 
-            response = session.get(U)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            processed_verse = soup.find('span', attrs={'class': 'verseShort'}).text
+                if processed_verse in smallverse:
+                    print('url already processed: {}'.format(U))
+                    continue
+                else:
+                    smallverse.append(processed_verse)
+                    """
+                     # Sans_meaning = get_data(U)[0]
+                    Sans_meaning, verse_sans, verse_transliteration, final_translation = get_data(U,Big_df)
+                    Bigdata.append(Sans_meaning)
+                    sanskrit.append(verse_sans)
+                    transliteration.append(verse_transliteration)
+                    translation.append(final_translation)
+                    
+                    """
+                    Sans_meaning, small_df= get_data(U,Big_df)
 
-            if processed_verse in smallverse:
-                print('url already processed: {}'.format(U))
-                continue
-            else:
-                smallverse.append(processed_verse)
-                """
-                 # Sans_meaning = get_data(U)[0]
-                Sans_meaning, verse_sans, verse_transliteration, final_translation = get_data(U,Big_df)
-                Bigdata.append(Sans_meaning)
-                sanskrit.append(verse_sans)
-                transliteration.append(verse_transliteration)
-                translation.append(final_translation)
-                
-                """                
-                Sans_meaning, small_df= get_data(U,Big_df)
+                    save_idx='chpt{}V{}'.format(i,idx+1)
 
-                save_idx='chpt{}V{}'.format(i,idx+1)
-
-                Big_df.at[save_idx, 'Sans'] = small_df['Sans'][0] 
-                Big_df.at[save_idx , 'Translation'] = small_df['Translation'][0]
-                Big_df.at[save_idx , 'Translit'] = small_df['Translit'][0]              
+                    Big_df.at[save_idx, 'Sans'] = small_df['Sans'][0]
+                    Big_df.at[save_idx , 'Translation'] = small_df['Translation'][0]
+                    Big_df.at[save_idx , 'Translit'] = small_df['Translit'][0]
 
 
             # print('testing')
