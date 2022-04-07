@@ -21,7 +21,7 @@ import pandas as pd
 #object = pd.read_pickle('Sans.pkl')
 
 
-with open('Sans.pkl', 'rb') as f:
+with open('data/Sans.pkl', 'rb') as f:
     loaded_dict= pickle.load(f)
     Sans=loaded_dict.decode("utf-8", "ignore")
     print(Sans)

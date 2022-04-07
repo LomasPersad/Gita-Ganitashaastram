@@ -22,8 +22,9 @@ import pandas as pd
 #from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
-import pickle
-import json
+#import pickle
+#import json
+import csv
 
 #testing!!
 
@@ -112,34 +113,34 @@ def get_transliteration(Transliteration):
     ele = Transliteration.find_all(text=True)  # splits into each part
     del ele[:1]
     del ele[-1:]
-    num_ele = len(ele)
+    #num_ele = len(ele)
     #tmp = []  # verse
     #sp = []  # speaker
-    sans=[]
-
-    if num_ele>3:
+    #sans=[]
+    """
+        if num_ele>3:
         if ((num_ele - 2) % 2) == 0: #if even number of verses
             kk = 0
             for i in range(0, num_ele-1):
                 if i % 2 == 0:
-                    tmp=[ele[i]+ ' | '+ ele[i+1]   ]
+                    tmp=[ele[i]+ ' | '+ ele[i+1] ]
                     sans.append(tmp)
-                    kk += 1
+
         else: #if odd number of verses then one is speaker!
              sans[0] = [ele[0] + ele[1] + ele[2]]
              kk = 1
              for i in range(3, (num_ele)):
                 if i % 2 != 0:
                     sans[kk] = [ele[i] + ele[i + 1]]
-                    kk += 1
+
     else: # for cases V1-3
         if ((num_ele - 2) % 2) == 0:
             sans = [ele[0] + ele[1]]
         else:
             sans=[ele[0]+ele[1]+ele[2]]
-
-
-    return sans
+    
+    """
+    return ele
 
 
 def Get_sans_meaning(soup):
@@ -209,15 +210,15 @@ df.to_csv('amazon_products.csv', index=False, encoding='utf-8')
 # urls=get_urls(base_url)
 # decide to skip this page or not
 smallverse = []
-Bigdata = []
+meaning = {}
 sanskrit = []
 transliteration = []
 translation = []
 
-Big_df = pd.DataFrame(columns=['Sans','Translit' 'Translation'])
+Big_df = pd.DataFrame(columns=['Sans','Translit', 'Translation'])
 
 with requests.Session() as session:
-    for i in range(1, 2): #chapters
+    for i in range(1, 19): #chapters
             base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
             #print(base_url)
             urls = get_urls(base_url)
@@ -249,12 +250,44 @@ with requests.Session() as session:
                     Big_df.at[save_idx, 'Sans'] = small_df['Sans'][0]
                     Big_df.at[save_idx , 'Translation'] = small_df['Translation'][0]
                     Big_df.at[save_idx , 'Translit'] = small_df['Translit'][0]
+                    meaning[save_idx]=Sans_meaning
 
 
             # print('testing')
             # print(U)
 
-Big_df.to_csv('BG.csv', index=False, sep=';')
+# create json object from dictionary
+# json = json.dumps(meaning)
+# # open file for writing, "w"
+# f = open("meaning.json","w")
+# # write json object to file
+# f.write(json)
+# # close file
+# f.close()
+
+# open file for writing
+f = open("meaning.txt","w")
+# write file
+f.write( str(meaning) )
+# close file
+f.close()
+
+
+
+# define a dictionary with key value pairs
+# open file for writing, "w" is writing
+w = csv.writer(open("meaning.csv", "w"))
+# loop over dictionary keys and values
+for key, val in meaning.items():
+    # write every key and value to file
+    w.writerow([key, val])
+
+
+
+Big_df['Sans'].to_csv('Sans.csv')
+Big_df['Translation'].to_csv('Translation.csv')
+Big_df['Translit'].to_csv('Translit.csv')
+
 
 """
 my_json_sans = json.dumps(sanskrit, ensure_ascii=False).encode('utf8')
