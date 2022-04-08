@@ -25,6 +25,7 @@ import requests
 #import pickle
 #import json
 import csv
+from Model import Chapter, Verse
 
 #testing!!
 
@@ -222,6 +223,13 @@ with requests.Session() as session:
             base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
             #print(base_url)
             urls = get_urls(base_url)
+            chapter = Chapter()
+            # chapter.chapter_number = hindi_numbers[chapter_number] # uncomment for hindi
+            # chapter.chapter_number = chapter_number  # comment for hindi
+            # chapter.chapter_summary = soup.find("p").text
+            # chapter.name = soup.find("b").text.split("-")[-1].strip()
+            # chapter.name_meaning = soup.find("h3").text
+            # chapter.verse_numbers = []
 
             for idx, U in enumerate(urls): #verses
                 print(U)

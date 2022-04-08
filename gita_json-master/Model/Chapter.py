@@ -7,4 +7,5 @@ class Chapter:
         self.chapter_summary = ''
         self.name = ''
         self.name_meaning = ''
-        self.verses_count = ''
+        self.verses = ''
+        #self.verses_count = ''
