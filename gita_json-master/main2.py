@@ -26,6 +26,8 @@ import requests
 # import json
 import csv
 from Model import Chapter, Verse
+import re
+
 
 data = {}
 data["chapters"] = {}
@@ -33,6 +35,8 @@ data["verses"] = {}
 
 chapters = data["chapters"]
 verses = data["verses"]
+
+
 
 def get_data(selected_Url):
     small_df = pd.DataFrame(columns=['Sans', 'Translit' 'Translation'])
@@ -121,6 +125,21 @@ def get_urls(url):
         # print("Processing page: #{page_number}; url: {url}".format(page_number=page_number, url=url))
         return urls
 
+def get_chpt_descript():
+    # Get chapter descriptions
+    with requests.Session() as session:
+        response1 = session.get('https://www.holy-bhagavad-gita.org/index')
+        soup2 = BeautifulSoup(response1.content, 'html.parser')
+        name_list = soup2.find_all(class_='listItem chapterItem')
+        name_list_items = []
+        for n in name_list:
+            name_list_items.append(n.find('p').text.split("-")[-1].strip())
+
+    return name_list_items
+
+
+
+
 # root_url='https://www.holy-bhagavad-gita.org/chapter/1/verse/1'
 # get_links(root_url)
 # Chapter 1
@@ -128,26 +147,43 @@ def get_urls(url):
 # base_url='https://www.holy-bhagavad-gita.org/chapter/1/verse/1'
 # urls=get_urls(base_url)
 # decide to skip this page or not
-smallverse = []
-meaning = {}
-sanskrit = []
-transliteration = []
-translation = []
+# smallverse = []
+# meaning = {}
+# sanskrit = []
+# transliteration = []
+# translation = []
 
-Big_df = pd.DataFrame(columns=['Sans', 'Translit', 'Translation'])
+
+
+
+#Big_df = pd.DataFrame(columns=['Sans', 'Translit', 'Translation'])
+#name_list_items=get_chpt_descript()
 
 with requests.Session() as session:
-    for i in range(1, 19):  # chapters
+    name_list_items = []
+    for i in range(1, 19):
+        base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}'.format(str(i))
+        response1 = session.get(base_url)
+        soup2 = BeautifulSoup(response1.content, 'html.parser')
+        name_list = soup2.find_all(class_='chapterIntro')
+        soup2.find('div', attrs = {'class': 'chapterIntro'})
+        for n in name_list:
+            name_list_items.append(n.find('p').text.split("-")[-1].strip())
+
+    chpt=1
+    for i in range(1, 3):  # chapters
         base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
         # print(base_url)
         urls = get_urls(base_url)
+
         chapter = Chapter()
         # chapter.chapter_number = hindi_numbers[chapter_number] # uncomment for hindi
-        # chapter.chapter_number = chapter_number  # comment for hindi
-        # chapter.chapter_summary = soup.find("p").text
-        # chapter.name = soup.find("b").text.split("-")[-1].strip()
+        chapter.chapter_number = i  # comment for hindi
+        #chapter.chapter_summary ='test' #soup.find("p").text
+        chapter.name =name_list_items[chpt]
         # chapter.name_meaning = soup.find("h3").text
         # chapter.verse_numbers = []
+        verses[i] = {}
         page_no = 1
         for idx, U in enumerate(urls):  # verses
             print(U)
@@ -163,17 +199,29 @@ with requests.Session() as session:
                 Sans_meaning, verse = get_data(U)
 
                 verse.verse_number = page_no  # comment for hindi
-                verses[page_no] = vars(verse)
+
+                verses[i][str(page_no)] = {}
+                verses[i][str(page_no)] = vars(verse)
                 page_no += 1
 
                 #save_idx = 'chpt{}V{}'.format(i, idx + 1)
                 #meaning[save_idx] = Sans_meaning
 
-        chapters[i] = vars(verses)
+        chpt=re.findall('\d*\.?\d+', processed_verse)
+        num_verse=str(chpt[0][-2:])
+        chapter.verses_count=num_verse
+        #chapter[i]= verses
+        #chapters[i] = chapter
         # print('testing')
         # print(U)
-    chapters[i] = vars(chapter)
+        chapters[i] = vars(chapter)
+        chpt+= 1
 
+
+# Writing the data to json file
+# Change file name for different language
+data_file = open("LP_dataset_english.json", "w", encoding="utf-8")
+json.dump(data, data_file, ensure_ascii=False)
 
 
 

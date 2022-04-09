@@ -8,4 +8,4 @@ class Chapter:
         self.name = ''
         self.name_meaning = ''
         self.verses = ''
-        #self.verses_count = ''
+        self.verses_count = ''
