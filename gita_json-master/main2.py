@@ -23,7 +23,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 # import pickle
-# import json
+import json
 import csv
 from Model import Chapter, Verse
 import re
@@ -137,7 +137,18 @@ def get_chpt_descript():
 
     return name_list_items
 
-
+def get_chpt_summary():
+    #Get Chapter summary
+    with requests.Session() as session:
+        chapter_sum = {}
+        for i in range(1, 19):
+            base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}'.format(str(i))
+            response1 = session.get(base_url)
+            soup2 = BeautifulSoup(response1.content, 'html.parser')
+            # name_list = soup2.find_all(class_='chapterIntro')
+            name_list = soup2.find('div', attrs={'class': 'chapterIntro'})
+            chapter_sum[i] = name_list.text.strip().replace('\xa0',' ')
+    return chapter_sum
 
 
 # root_url='https://www.holy-bhagavad-gita.org/chapter/1/verse/1'
@@ -147,31 +158,22 @@ def get_chpt_descript():
 # base_url='https://www.holy-bhagavad-gita.org/chapter/1/verse/1'
 # urls=get_urls(base_url)
 # decide to skip this page or not
-# smallverse = []
+smallverse = []
 # meaning = {}
 # sanskrit = []
 # transliteration = []
 # translation = []
 
 
-
+name_list_items=get_chpt_descript()
+chapter_sum=get_chpt_summary()
 
 #Big_df = pd.DataFrame(columns=['Sans', 'Translit', 'Translation'])
 #name_list_items=get_chpt_descript()
 
 with requests.Session() as session:
-    name_list_items = []
-    for i in range(1, 19):
-        base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}'.format(str(i))
-        response1 = session.get(base_url)
-        soup2 = BeautifulSoup(response1.content, 'html.parser')
-        name_list = soup2.find_all(class_='chapterIntro')
-        soup2.find('div', attrs = {'class': 'chapterIntro'})
-        for n in name_list:
-            name_list_items.append(n.find('p').text.split("-")[-1].strip())
-
-    chpt=1
-    for i in range(1, 3):  # chapters
+    chpt=0
+    for i in range(1, 19):  # chapters
         base_url = 'https://www.holy-bhagavad-gita.org/chapter/{}/verse/1'.format(str(i))
         # print(base_url)
         urls = get_urls(base_url)
@@ -179,7 +181,7 @@ with requests.Session() as session:
         chapter = Chapter()
         # chapter.chapter_number = hindi_numbers[chapter_number] # uncomment for hindi
         chapter.chapter_number = i  # comment for hindi
-        #chapter.chapter_summary ='test' #soup.find("p").text
+        chapter.chapter_summary =chapter_sum[i]
         chapter.name =name_list_items[chpt]
         # chapter.name_meaning = soup.find("h3").text
         # chapter.verse_numbers = []
@@ -207,8 +209,8 @@ with requests.Session() as session:
                 #save_idx = 'chpt{}V{}'.format(i, idx + 1)
                 #meaning[save_idx] = Sans_meaning
 
-        chpt=re.findall('\d*\.?\d+', processed_verse)
-        num_verse=str(chpt[0][-2:])
+        get_chpt=re.findall('\d*\.?\d+', processed_verse)
+        num_verse=str(get_chpt[0][-2:])
         chapter.verses_count=num_verse
         #chapter[i]= verses
         #chapters[i] = chapter
