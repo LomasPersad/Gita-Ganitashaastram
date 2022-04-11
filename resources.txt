@@ -6,4 +6,18 @@ https://github.com/kashishkhullar/gita_json
 
 https://www.flerlagetwins.com/2017/01/word-analysis-bhagavad-gita_40.html
 
+# https://bhagavad-gita.org/
+# https://jovian.ai/vedant-madane/autosummarize-rulebased
+# https://www.youtube.com/watch?v=SWYqp7iY_Tc   Git tutorial
+# https://github.com/mpanchmatia/BhagavadGitaAlphabet
+# https://github.com/kodematrix/Sentiment-Analysis
+
+
+# https://www.kaggle.com/datasets/schcsaba/bhagavadgita
+# https://www.kaggle.com/code/yadavrohit/bhagavad-gita-analysis/notebook
+# https://en.wikipedia.org/wiki/Sanskrit_nominals#Pronouns_and_determiners
+
 New!!
+
+
+https://sanskritdocuments.org/sanskrit/bhagavadgita/

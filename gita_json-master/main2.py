@@ -3,11 +3,7 @@
 
 
 # modified from https://www.datacamp.com/community/tutorials/amazon-web-scraping-using-beautifulsoup
-# https://bhagavad-gita.org/
-# https://jovian.ai/vedant-madane/autosummarize-rulebased
-# https://www.youtube.com/watch?v=SWYqp7iY_Tc   Git tutorial
-# https://github.com/mpanchmatia/BhagavadGitaAlphabet
-# https://github.com/kodematrix/Sentiment-Analysis
+
 
 import pandas as pd
 # import numpy as np
