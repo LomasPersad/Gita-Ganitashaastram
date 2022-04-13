@@ -9,6 +9,8 @@ from wordcloud import WordCloud,STOPWORDS
 import re
 import json
 import collections
+from nltk.probability import FreqDist
+import nltk
 # from indic_transliteration import sanscript
 # Input data files are available in the "../input/" directory.
 # For example, running this (by clicking run or pressing Shift+Enter) will list the files in the input directory
@@ -64,6 +66,16 @@ def get_verses():
     # json.dump(V, data_file, ensure_ascii=False)
     BG_total.to_csv('BG_dataframe.csv')
 
+def compile_stopwords_list_frequency(text, freq_percentage=0.02):
+
+    words = nltk.tokenize.word_tokenize(text)
+    freq_dist = FreqDist(word.lower() for word in words)
+    words_with_frequencies = [(word, freq_dist[word]) for word in freq_dist.keys()]
+    sorted_words = sorted(words_with_frequencies, key=lambda tup: tup[1])
+    length_cutoff = int(freq_percentage*len(sorted_words))
+    stopwords = [tuple[0] for tuple in sorted_words[-length_cutoff:]]
+    return stopwords
+
 
 # df.to_csv(file_name, sep='\t', encoding='utf-8')
 
@@ -83,7 +95,7 @@ def get_verses():
 # df_verses.rename(columns ={0:'hindi'}, inplace = True)
 # ----------------OLD way
 
-
+# nltk.download('punkt')
 
 BGdata= pd.read_csv('BG_dataframe.csv') # ['Chapter','Verse','Sanskrit','Transliteration']
 
@@ -153,11 +165,16 @@ data_flat1 = [item for sublist in data1 for item in sublist]
 # as per my knowledge of this holy document it makes sense to see these results because of the words used such as भारत, अर्जुन, कर्म, ज्ञानं.
 top_10_translit = [i[0] for i in sorted(dict(collections.Counter(data_flat1)).items(), key=lambda k: k[1], reverse=True)[:20]]
 print(top_10_translit)
+
+# stopwords = compile_stopwords_list_frequency(data_flat1)
+# stopwords.remove("holmes")
+# stopwords.remove("watson")
+
 #plot world cloud- generate for all, then each chapter
 wordfreq1 = collections.Counter(data_flat1)
-# text = data_flat1
+text = data_flat1
 fig = plt.figure(figsize=(20,10), facecolor='k')
-wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf').generate(str(wordfreq1))
+wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf').generate(str(text))
 plt.imshow(wordcloud,interpolation='bilinear')
 plt.axis("off")
 plt.show()
