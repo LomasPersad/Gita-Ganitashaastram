@@ -1,4 +1,5 @@
 # Import modules
+from PIL import Image
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -75,6 +76,15 @@ def compile_stopwords_list_frequency(text, freq_percentage=0.02):
     length_cutoff = int(freq_percentage*len(sorted_words))
     stopwords = [tuple[0] for tuple in sorted_words[-length_cutoff:]]
     return stopwords
+
+def transform_zeros(val):
+    for i in val:
+        if val[i] == 0:
+            val[i]=255
+
+    return val
+
+
 
 
 # df.to_csv(file_name, sep='\t', encoding='utf-8')
@@ -169,12 +179,21 @@ print(top_10_translit)
 # stopwords = compile_stopwords_list_frequency(data_flat1)
 # stopwords.remove("holmes")
 # stopwords.remove("watson")
+sherlock_data = Image.open("plots/Krishna_BK.png")
+mask = np.array(sherlock_data)
+
+maskable_image = np.ndarray((mask.shape[0],mask.shape[1]), np.int32)
+
+for i in range(len(mask)):
+    maskable_image[i] = list(map(transform_zeros, mask[i]))
+
+
 
 #plot world cloud- generate for all, then each chapter
 wordfreq1 = collections.Counter(data_flat1)
 text = data_flat1
 fig = plt.figure(figsize=(20,10), facecolor='k')
-wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf').generate(str(text))
+wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf',mask=maskable_image).generate(str(text))
 plt.imshow(wordcloud,interpolation='bilinear')
 plt.axis("off")
 plt.show()
