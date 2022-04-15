@@ -179,13 +179,14 @@ print(top_10_translit)
 # stopwords = compile_stopwords_list_frequency(data_flat1)
 # stopwords.remove("holmes")
 # stopwords.remove("watson")
-sherlock_data = Image.open("plots/Krishna_BK.png")
+# sherlock_data = Image.open("/home/ubuntu/Downloads/sherlock.png")
+sherlock_data = Image.open("plots/image2.png")
 mask = np.array(sherlock_data)
 
-maskable_image = np.ndarray((mask.shape[0],mask.shape[1]), np.int32)
-
-for i in range(len(mask)):
-    maskable_image[i] = list(map(transform_zeros, mask[i]))
+# maskable_image = np.ndarray((mask.shape[0],mask.shape[1]), np.int32)
+#
+# for i in range(len(mask)):
+#     maskable_image[i] = list(map(transform_zeros, mask[i]))
 
 
 
@@ -193,7 +194,7 @@ for i in range(len(mask)):
 wordfreq1 = collections.Counter(data_flat1)
 text = data_flat1
 fig = plt.figure(figsize=(20,10), facecolor='k')
-wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf',mask=maskable_image).generate(str(text))
+wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf',mask=mask).generate(str(text))
 plt.imshow(wordcloud,interpolation='bilinear')
 plt.axis("off")
 plt.show()
