@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # from matplotlib import rc
 # import matplotlib.image as mpimg
 import seaborn as sns
-from wordcloud import WordCloud,STOPWORDS
+from wordcloud import WordCloud,STOPWORDS, ImageColorGenerator
 import re
 import json
 import collections
@@ -77,12 +77,7 @@ def compile_stopwords_list_frequency(text, freq_percentage=0.02):
     stopwords = [tuple[0] for tuple in sorted_words[-length_cutoff:]]
     return stopwords
 
-def transform_zeros(val):
-    for i in val:
-        if val[i] == 0:
-            val[i]=255
 
-    return val
 
 
 
@@ -111,7 +106,7 @@ BGdata= pd.read_csv('BG_dataframe.csv') # ['Chapter','Verse','Sanskrit','Transli
 
 
 # --------------Barchart #------plot chapter-verse#
-"""
+
 #get data
 data=get_data('LP_dataset_english.json') # all data
 plt_vers = pd.DataFrame(columns=['chpt','Verse_count'])
@@ -148,18 +143,19 @@ for container in ax.containers:
     #     weight='bold'
     # )
 # plt.imshow(img, extent=[110, 40, 110, 400], aspect='auto')
-plt.imshow(my_image,
-         aspect=ax.get_aspect(),
-         extent= ax.get_xlim() + ax.get_ylim(),
-         zorder=1, alpha=0.6)
+# plt.imshow(my_image,
+#          aspect=ax.get_aspect(),
+#          extent= ax.get_xlim() + ax.get_ylim(),
+#          zorder=1, alpha=0.6)
 ax=sns.barplot(x='chpt', y='Verse_count', data=Chpt_versecount)
-plt.xlabel("Chapter number", fontsize=16, fontname='Nimbus sans')
-plt.ylabel("Number of Verses", fontsize=16, fontname='Nimbus sans')
+plt.xlabel("Chapter number", fontsize=20, fontname='Nimbus sans')
+plt.ylabel("Number of Verses", fontsize=20, fontname='Nimbus sans')
 # Displaying the plot
 plt.tight_layout()
 plt.show()
 # plt.savefig('plots/BG_verse_count.png')
-"""
+# plt.savefig('plots/BG_verse_count.png')
+
 
 #<---------------Transliteration section
 df_verses = BGdata.apply(lambda row: row['Transliteration'].strip().split(), axis=1)
@@ -180,24 +176,24 @@ print(top_10_translit)
 # stopwords.remove("holmes")
 # stopwords.remove("watson")
 # sherlock_data = Image.open("/home/ubuntu/Downloads/sherlock.png")
-sherlock_data = Image.open("plots/image2.png")
-mask = np.array(sherlock_data)
+# sherlock_data = Image.open("plots/Krishna.png")
+# sherlock_data = Image.open("/home/ubuntu/Downloads/k2.png")
+# mask = np.array(sherlock_data)
 
-# maskable_image = np.ndarray((mask.shape[0],mask.shape[1]), np.int32)
-#
-# for i in range(len(mask)):
-#     maskable_image[i] = list(map(transform_zeros, mask[i]))
-
-
+# create coloring from image
+Colorimg = Image.open("plots/k2.png")
+mask = np.array(Colorimg)
+image_colors = ImageColorGenerator(mask)
 
 #plot world cloud- generate for all, then each chapter
 wordfreq1 = collections.Counter(data_flat1)
 text = data_flat1
 fig = plt.figure(figsize=(20,10), facecolor='k')
-wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf',mask=mask).generate(str(text))
-plt.imshow(wordcloud,interpolation='bilinear')
+wordcloud = WordCloud(background_color="white",width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf',mask=mask).generate(str(text))
+plt.imshow(wordcloud.recolor(color_func=image_colors),interpolation='bilinear')
 plt.axis("off")
 plt.show()
+wordcloud.to_file('plots/WC_krish.png')
 
 
 
