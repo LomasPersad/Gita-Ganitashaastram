@@ -13,6 +13,7 @@ import collections
 from nltk.probability import FreqDist
 from nltk.text import Text
 import nltk
+from tqdm import tqdm
 
 # from indic_transliteration import sanscript
 # Input data files are available in the "../input/" directory.
@@ -229,21 +230,104 @@ def Translit_Wordcloud(data_flat1,savename):
     # stopwords.remove("arjun")
     # stopwords.remove("krishna")
 
-    sherlock_data = Image.open("plots/Krishna.png")
+    img_data = Image.open("plots/Krishna.png")
     # sherlock_data = Image.open("/home/ubuntu/Downloads/k2.png")
-    mask = np.array(sherlock_data)
+    mask = np.array(img_data)
     # plot world cloud- generate for all, then each chapter
     wordfreq1 = collections.Counter(data_flat1)
     text = data_flat1
-    fig = plt.figure(figsize=(20, 10), facecolor='k')
+    plt.figure(figsize=(20, 10), facecolor='k')
     wordcloud = WordCloud(background_color="white", width=1300, height=600, max_words=2000,
-                          font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf', mask=mask).generate(
-        str(text))
+                          font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf', mask=mask).generate(str(text)) #,contour_width=1, contour_color='steelblue'
+    # wordcloud.to_file('plots/WC_krish.png')
+    wordcloud.to_file('plots/' + savename)
+    #show
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    # wordcloud.to_file('plots/WC_krish.png')
-    wordcloud.to_file('plots/'+ savename)
     plt.show()
+
+
+    # #-----------create coloring from image
+    # Colorimg = Image.open("plots/k2.png")
+    # mask = np.array(Colorimg)
+    # image_colors = ImageColorGenerator(mask)
+    # # plot world cloud- generate for all, then each chapter
+    # wordfreq1 = collections.Counter(data_flat1)
+    # text = data_flat1
+    # fig = plt.figure(figsize=(20, 10), facecolor='k')
+    # wordcloud = WordCloud(background_color="white", width=1300, height=600, max_words=2000,
+    #                       font_path='/home/ubuntu/Downloads/Eczar/Eczar-VariableFont_wght.ttf', mask=mask).generate(
+    #     str(text))
+    # plt.imshow(wordcloud.recolor(color_func=image_colors), interpolation='bilinear')
+    # plt.axis("off")
+    # plt.show()
+    # wordcloud.to_file('plots/WC_krish.png')
+
+def get_top_sanskrit_words(BGdata,n):
+    df_verses = BGdata.apply(lambda row: row['Sanskrit'].strip().split(), axis=1)
+    data1 = []
+    for row in df_verses:
+        temp = []
+        for words in row:
+            if len(words) > 2:
+                temp.append(words)
+        data1.append(temp)
+    data_flat1 = [item for sublist in data1 for item in sublist]
+    # Getting to know the most prominent 10 words used across the documen
+    # as per my knowledge of this holy document it makes sense to see these results because of the words used such as भारत, अर्जुन, कर्म, ज्ञानं.
+    top_n_translit = [i[0] for i in sorted(dict(collections.Counter(data_flat1)).items(), key=lambda k: k[1], reverse=True)[:n]]
+    return top_n_translit, data_flat1
+
+def sanskrit_Wordcloud(data_flat1,savename):
+    # data_flat1 = get_top_words(BGdata, 5)[1]
+    # create stopword list from top_10_translit
+    # stopwords = compile_stopwords_list_frequency(top_10_translit)
+    # stopwords.remove("arjun")
+    # stopwords.remove("krishna")
+
+    stopword = open('hindi-tokenizer-master/stopwords.txt', 'r')
+    stop_words = []
+    # pre-process stopword
+    for i in stopword:
+        i = re.sub('[\n]', '', i)
+        stop_words.append(i)
+        stopwords = set(stop_words)
+
+    # creating a dictionary of all the words with values as their counts.
+    # wordfreq = {}
+    # for w in tqdm(data_flat1):
+    #     if w in wordfreq.keys():
+    #         wordfreq[w] += 1
+    #     else:
+    #         wordfreq[w] = 1
+
+    img_data = Image.open("plots/Krishna.png")
+    # sherlock_data = Image.open("/home/ubuntu/Downloads/k2.png")
+    mask = np.array(img_data)
+    # plot world cloud- generate for all, then each chapter
+    wordfreq1 = collections.Counter(data_flat1)
+    # text = data_flat1
+    plt.figure(figsize=(20, 10), facecolor='k')
+    wordcloud = WordCloud(background_color="white", width=1080, height=960, max_words=2000,
+                          font_path='/home/ubuntu/Downloads/chandas.ttf',
+                          mask=mask,min_font_size = 5,stopwords=stopwords).generate_from_frequencies(wordfreq1)
+                          #,contour_width=1, contour_color='steelblue'
+                          # font_path='/home/ubuntu/Downloads/Yatra_One/YatraOne-Regular.ttf',
+                          # stopwords=stopwords)
+                          # /home/ubuntu/Downloads/lohit_devanagari/Lohit-Devanagari.ttf
+
+    # wordcloud = WordCloud(font_path='/home/ubuntu/Downloads/chandas.ttf', width=1080, height=960,
+    #                       background_color='black',
+    #                       max_words=100,
+    #                       collocations=False,
+    #                       min_font_size=5).generate_from_frequencies(wordfreq)
+    # wordcloud.to_file('plots/WC_krish.png')
+    wordcloud.to_file('plots/' + savename)
+    #show
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.show()
+
 
     # #-----------create coloring from image
     # Colorimg = Image.open("plots/k2.png")
@@ -274,92 +358,125 @@ class txt_color:
    END = '\033[0m'
 
 
-# df.to_csv(file_name, sep='\t', encoding='utf-8')
 
 
-#-----------------------main code
-#--------redo getverse -save csv
-# get_verses()
+if __name__ == "__main__":
+    #-----------------------main code
+    #--------redo getverse -save csv
+    # get_verses()
 
-#---------------------ANALYSE Sanskrit
-# Opening JSON file
-# f = open('LP_verses.json')
-# Verses = json.load(f)
-# f.close()
-# ---------------OLD way
-# Verses=get_data('LP_verses.json')
-# df_verses = pd.DataFrame(Verses)
-# df_verses.rename(columns ={0:'hindi'}, inplace = True)
-# ----------------OLD way
-# nltk.download('punkt')
+    #---------------------ANALYSE Sanskrit
+    # Opening JSON file
+    # f = open('LP_verses.json')
+    # Verses = json.load(f)
+    # f.close()
+    # ---------------OLD way
+    # Verses=get_data('LP_verses.json')
+    # df_verses = pd.DataFrame(Verses)
+    # df_verses.rename(columns ={0:'hindi'}, inplace = True)
+    # ----------------OLD way
+    # nltk.download('punkt')
+    # df.to_csv(file_name, sep='\t', encoding='utf-8')
 
+    # Load data from analyse function
+    BGdata= pd.read_csv('BG_dataframe.csv') # ['Chapter','Verse','Sanskrit','Transliteration']
 
-BGdata= pd.read_csv('BG_dataframe.csv') # ['Chapter','Verse','Sanskrit','Transliteration']
+    # --------------Barchart #------plot chapter-verse#
+    # plot_barchart()
 
-# --------------Barchart #------plot chapter-verse#
-# plot_barchart()
-
-#<---------------Transliteration section
-#get top n words
-# top_n_translit,data_flat=get_top_words(BGdata,20)
-# # for w in enumerate(top_n_translit):
-# #     print(txt_color.PURPLE +'top 5 words are:' + txt_color.END + top_n_translit[w.index(0)])
-# print(top_n_translit)
-
-#Make wordcloud of all verses
-# Translit_Wordcloud(data_flat,'WC_krish.png')
-
-#Common words for each chapter
-for i in range(1,2):
-    # i=1
-    BGdata2=BGdata[BGdata.Chapter==i]
-    top_n_translit,data_flat=get_top_words(BGdata2,10)
+    #<---------------Transliteration section
+    #get top n words
+    # top_n_translit,data_flat=get_top_words(BGdata,20)
+    # # for w in enumerate(top_n_translit):
+    # #     print(txt_color.PURPLE +'top 5 words are:' + txt_color.END + top_n_translit[w.index(0)])
     # print(top_n_translit)
-    bgita = Text(data_flat)
-    bgita.concordance('uvācha')
-    print(f'"Krishna" appears {data_flat.count("kṛiṣhṇa")} time(s) in chapter {i}')
-    print(f'"Arjuna" appears {data_flat.count("arjuna")} time(s) in chapter {i}')
-    # print(f'"cha" appears {data_flat.count("cha")} time(s)')
-    # savenm='wc_krish2_chapt{}.png'.format(i)
-    # Translit_Wordcloud(data_flat,savenm)
 
-#Count speakers
+    #Make wordcloud of all verses
+    # Translit_Wordcloud(data_flat,'WC_krish.png')
 
+    #Common words for each chapter - double check!
+    # for i in range(1,2):
+    #     # i=1
+    #     BGdata2=BGdata[BGdata.Chapter==i]
+    #     top_n_translit,data_flat=get_top_words(BGdata2,10)
+    #     # print(top_n_translit)
+    #     bgita = Text(data_flat)
+    #     bgita.concordance('uvācha')
+    #     print(f'"Krishna" appears {data_flat.count("kṛiṣhṇa")} time(s) in chapter {i}')
+    #     print(f'"Arjuna" appears {data_flat.count("arjuna")} time(s) in chapter {i}')
+    #     # print(f'"cha" appears {data_flat.count("cha")} time(s)')
+    #     # savenm='wc_krish2_chapt{}.png'.format(i)
+    #     # Translit_Wordcloud(data_flat,savenm)
 
-
-#<----------------------hindi section
-#get common words df_verses.head()
-df_verses = BGdata.apply(lambda row: row['Sanskrit'].strip().split(), axis=1)
-data = []
-for row in df_verses:
-    temp = []
-    for words in row:
-        if len(words)>2:
-            temp.append(words)
-    data.append(temp)
-data_flat = [item for sublist in data for item in sublist]
-
-# Getting to know the most prominent 10 words used across the documen
-# as per my knowledge of this holy document it makes sense to see these results because of the words used such as भारत, अर्जुन, कर्म, ज्ञानं.
-top_10 = [i[0] for i in sorted(dict(collections.Counter(data_flat)).items(), key=lambda k: k[1], reverse=True)[:20]]
-print(top_10)
-
-stopword=open('hindi-tokenizer-master/stopwords.txt','r')
-stop_words=[]
-# pre-process stopword
-for i in stopword:
-    i = re.sub('[\n]', '', i)
-    stop_words.append(i)
-    stopwords = set(stop_words)
+    #Count speakers
 
 
-#plot world cloud- generate for all, then each chapter
-wordfreq = collections.Counter(data_flat)
-text = data_flat
-fig = plt.figure(figsize=(20,10), facecolor='k')
-wordcloud = WordCloud(width=1300, height=600,max_words=2000,font_path='/home/ubuntu/Downloads/Yatra_One/YatraOne-Regular.ttf',stopwords = stopwords).generate(str(wordfreq))
-plt.imshow(wordcloud,interpolation='bilinear')
-plt.axis("off")
-plt.show()
 
-# /home/ubuntu/Downloads/lohit_devanagari/Lohit-Devanagari.ttf
+    #<----------------------hindi section
+    top_n_Sans,data_flat_sans=get_top_sanskrit_words(BGdata,15)
+    print(top_n_Sans)
+    # sanskrit_Wordcloud(data_flat_sans,'WC_sans_krish.png')
+    print(f'"Krishna" appears {data_flat_sans.count("श्रीभगवानुवाच")} time(s)')
+    print(f'"Arjuna" appears {data_flat_sans.count("अर्जुन")} time(s)')
+
+    # joined = " ".join(data_flat_sans)
+    sum(data_flat_sans.count(x) for x in ("श्रीभगवानुवाच", "माधव","केशव","हृषिकेश","अच्युत","मधुसूदन","मुरारि","केशव","दामोदर","वसुदेव","गोविंद","मुरली"))
+
+    #collect each speaker
+    # Arjun_verse=[]
+    # Arjun_verse_translit = []
+    Krishna_verse = []
+    Krishna_verse_translit = []
+
+    Arjun_verse = pd.DataFrame(columns=['Chapter', 'Verse', 'Sanskrit', 'Transliteration'])
+
+    for index,ver in enumerate(BGdata['Sanskrit']):
+        line=ver
+        translit_line=BGdata['Transliteration'][index]
+        i=BGdata['Chapter'][index]
+        v=BGdata['Verse'][index]
+
+        if line.find(u'अर्जुन उवाच') > -1:
+            speaker = 'Arjun'
+            Arjun_verse=Arjun_verse.append({'Chapter': i, 'Verse': v, 'Sanskrit': line, 'Transliteration': translit_line},ignore_index = True)
+            # Arjun_verse.append(line)
+            # Arjun_verse_translit.append(translit_line)
+            continue
+        if line.find(u'श्रीभगवानुवाच') > -1:
+            speaker = 'Bhagawan'
+            Krishna_verse.append(line)
+            Krishna_verse_translit.append(translit_line)
+            continue
+        if line.find(u'सञ्जय उवाच') > -1:
+            speaker = 'Sanjay'
+            continue
+        if line.find(u'धृतराष्ट्र उवाच') > -1:
+            speaker = 'Dhritarashtra'
+            continue
+        # if (line.find(u'ॐ तत्सदिति श्रीमद्भगवद्गीतासूपनिषत्सु') > -1) or (line.find(u'ब्रह्मविद्यायां') > -1) or (
+        #         line.find(u'ध्यायः') > -1):
+        #     speaker = 'None'
+        #     continue
+    for v in Arjun_verse['Transliteration']:
+        print(v)
+
+
+
+
+
+    #plot world cloud- generate for all, then each chapter
+    for i in range(1,2):
+        # i=1
+        BGdata2=BGdata[BGdata.Chapter==i]
+        top_n_Sans,data_flat_sans=get_top_sanskrit_words(BGdata2,10)
+        # print(top_n_translit)
+        # bgita = Text(data_flat)
+        # bgita.concordance('uvācha')
+        print(f'"Krishna" appears {data_flat_sans.count("श्रीभगवानुवाच")} time(s) in chapter {i}')
+        print(f'"Krishna" appears {data_flat_sans.count("हृषीकेशो")} time(s) in chapter {i}')
+        print(f'"Arjuna" appears {data_flat_sans.count("अर्जुन")} time(s) in chapter {i}')
+        # print(f'"cha" appears {data_flat.count("cha")} time(s)')
+        # savenm='wc_sans_krish2_chapt{}.png'.format(i)
+        # sanskrit_Wordcloud(data_flat_sans,savenm)
+
+
