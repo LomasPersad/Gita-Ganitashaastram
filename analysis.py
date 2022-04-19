@@ -96,7 +96,7 @@ def plot_barchart():
         # new_list={'chpt': int(i), 'Verse_count': int(num)}
 
         # new_list = {'chpt':'Chpt. {} - {}'.format(i,chpt_name[0]), 'Verse_count': int(num)}
-        new_list = {'chpt': "$\\bf{Chpt.}$" + "$\\bf{" + '{}'.format(i) + "}$" + '-' + chpt_name[0],
+        new_list = {'chpt': "$\\bf{Chpt.}$" + "$\\bf{" + '{}'.format(i) + "}$" + '-' + chpt_name[0] + '-'+ "$\\bf{"+'{}'.format(num) +"}$ "+ 'verses',
                     'Verse_count': int(num)}
         alist.append(new_list)
 
@@ -139,11 +139,11 @@ def plot_barchart():
         width=width,
         bottom=lowerLimit,
         linewidth=2,
-        edgecolor="black",
+        edgecolor="white",
         color="#a371c7",
     )
     # little space between the bar and the label
-    labelPadding = 6
+    labelPadding = 1
 
     # Add labels
     for bar, angle, height, label in zip(bars, angles, heights, Chpt_versecount["chpt"]):
@@ -169,8 +169,9 @@ def plot_barchart():
             color="#000000",
             rotation=rotation,
             rotation_mode="anchor")
-    for container in ax.containers:
-        ax.bar_label(container, weight='bold')
+
+    # for container in ax.containers:
+    #     ax.bar_label(container, weight='bold',color='#27065c') #fontsize=8 label_type='center'
 
     plt.savefig('plots/BG_verse_count.png', dpi=300)
     plt.show()
@@ -420,7 +421,8 @@ if __name__ == "__main__":
     print(f'"Arjuna" appears {data_flat_sans.count("अर्जुन")} time(s)')
 
     # joined = " ".join(data_flat_sans)
-    sum(data_flat_sans.count(x) for x in ("श्रीभगवानुवाच", "माधव","केशव","हृषिकेश","अच्युत","मधुसूदन","मुरारि","केशव","दामोदर","वसुदेव","गोविंद","मुरली"))
+    Krish_word_count=sum(data_flat_sans.count(x) for x in ("श्रीभगवानुवाच", "माधव","केशव","हृषिकेश","अच्युत","मधुसूदन","मुरारि","केशव","दामोदर","वसुदेव","गोविंद","मुरली"))
+    print(Krish_word_count)
 
     #collect each speaker
     # Arjun_verse=[]
