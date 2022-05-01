@@ -60,7 +60,7 @@ def get_verses():
             V[indx]=tmp
             # Store in dataframe
             translit=data['verses'][str(i)][str(v)]['transliteration']
-            translit = translit.replace('-',' ')
+            # translit = translit.replace('-',' ')
             BG_total=BG_total.append({'Chapter': i, 'Verse': v, 'Sanskrit': tmp, 'Transliteration': translit},ignore_index = True)
 
             indx+=1
@@ -70,6 +70,7 @@ def get_verses():
     # data_file = open("LP_verses.json", "w", encoding="utf-8")
     # json.dump(V, data_file, ensure_ascii=False)
     BG_total.to_csv('BG_dataframe.csv')
+
 
 def compile_stopwords_list_frequency(text, freq_percentage=0.02):
 
@@ -387,13 +388,13 @@ if __name__ == "__main__":
 
     #<---------------Transliteration section
     #get top n words
-    # top_n_translit,data_flat=get_top_words(BGdata,20)
-    # # for w in enumerate(top_n_translit):
-    # #     print(txt_color.PURPLE +'top 5 words are:' + txt_color.END + top_n_translit[w.index(0)])
-    # print(top_n_translit)
+    top_n_translit,data_flat=get_top_words(BGdata,10)
+    # for w in enumerate(top_n_translit):
+    #     print(txt_color.PURPLE +'top 10 words are:' + txt_color.END + top_n_translit[w.index(0)])
+    print(top_n_translit)
 
     #Make wordcloud of all verses
-    # Translit_Wordcloud(data_flat,'WC_krish.png')
+    Translit_Wordcloud(data_flat,'WC_krish.png')
 
     #Common words for each chapter - double check!
     # for i in range(1,2):
@@ -418,7 +419,7 @@ if __name__ == "__main__":
     print(top_n_Sans)
     # sanskrit_Wordcloud(data_flat_sans,'WC_sans_krish.png')
     print(f'"Krishna" appears {data_flat_sans.count("श्रीभगवानुवाच")} time(s)')
-    print(f'"Arjuna" appears {data_flat_sans.count("अर्जुन")} time(s)')
+    print(f'"Arjuna" appears {data_flat_sans.count("अर्जुन" )} time(s)')
 
     # joined = " ".join(data_flat_sans)
     Krish_word_count=sum(data_flat_sans.count(x) for x in ("श्रीभगवानुवाच", "माधव","केशव","हृषिकेश","अच्युत","मधुसूदन","मुरारि","केशव","दामोदर","वसुदेव","गोविंद","मुरली"))
@@ -459,8 +460,12 @@ if __name__ == "__main__":
         #         line.find(u'ध्यायः') > -1):
         #     speaker = 'None'
         #     continue
-    for v in Arjun_verse['Transliteration']:
-        print(v)
+    for idx,v in enumerate(Arjun_verse['Transliteration']):
+        # print(v)
+
+        chpt=Arjun_verse['Chapter'][idx]
+        vrs=Arjun_verse['Verse'][idx]
+        print(f'Chapter {chpt}.{vrs}: {v}')
 
 
 
