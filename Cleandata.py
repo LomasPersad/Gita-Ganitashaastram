@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 
-
+#test sync
 def get_versesV2():
     # Opening JSON file
     # f = open('LP_dataset_english.json')
@@ -13,7 +13,9 @@ def get_versesV2():
     # # Closing file
     # f.close()
 
-    sans_data = pd.read_csv('/home/ubuntu/Documents/Gita/Gita-Ganitashaastram/Sans.csv')
+    # sans_data = pd.read_csv('/home/ubuntu/Documents/Gita/Gita-Ganitashaastram/Sans.csv') #NVME drive
+    sans_data = pd.read_csv('/home/ubuntu/Documents/Gita_Ganitashaastram.io/Sans.csv') #USB drive
+
 
     # Iterating through the chapters
     # list
@@ -25,11 +27,12 @@ def get_versesV2():
     # Iterating through the verses
     for i in sans_data:
             # print(data['verses'][str(i)][str(v)]['text'].replace('।।\* ।।',' '))
-            print(sans_data['Sans'][i]) ?-------- to do. seperate sanskrit verses in two. match each sanskrit word to corresponding transliteration
+            print(sans_data['Sans'][i])
+            # ?-------- to do. seperate sanskrit verses in two. match each sanskrit word to corresponding transliteration
 
 
-            ele = Transliteration.find_all(text=True)
-            print('chapter{} and verse{}'.format(i,v))
+            # ele = Transliteration.find_all(text=True)
+            # print('chapter{} and verse{}'.format(i,v))
             # tmp=data['verses'][str(i)][str(v)]['text']
             # tmp = tmp.replace('।', ' ')#remove symbol
             # tmp = re.sub(r'\d+', '', tmp) #remove number
@@ -50,8 +53,8 @@ if __name__ == "__main__":
     #-----------------------main code
     #--------redo getverse -save csv
     get_versesV2()
-    print(BGdata['Sanskrit'])
-    # print(BGdata['Transliteration'][0])
-    BGdata.loc[BGdata['Chapter'] == 1, 'Transliteration'].iloc[0]
+    # print(BGdata['Sanskrit'])
+    # # print(BGdata['Transliteration'][0])
+    # BGdata.loc[BGdata['Chapter'] == 1, 'Transliteration'].iloc[0]
 
 
