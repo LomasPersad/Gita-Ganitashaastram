@@ -1,5 +1,6 @@
 # Script to clean and arrange data that was scrapped
 import pandas as pd
+import numpy as np
 import json
 
 
@@ -25,9 +26,25 @@ def get_versesV2():
     indx=0
     BG_total = pd.DataFrame(columns=['Chapter','Verse','Sanskrit'])
     # Iterating through the verses
-    for i in sans_data:
+    for i in range(len((sans_data))):
             # print(data['verses'][str(i)][str(v)]['text'].replace('।।\* ।।',' '))
-            print(sans_data['Sans'][i])
+            # print(sans_data['Sans'][i])
+            temp =sans_data["Sans"][i].replace("'",'').replace(",",'').replace("[", "").replace("]",'')
+            temp=temp.split('||')
+
+            if len(temp)==3: #one verse
+                print(temp[0])
+                # V=temp[0]
+                # V_n=temp[1]
+                print(temp[1])
+            elif len(temp)>3:
+                # rng=np.arange(0,len(temp),1)
+                V = temp[0:len(temp):2]
+                V_n=temp[1:len(temp):2]
+                print(lp)
+
+
+
             # ?-------- to do. seperate sanskrit verses in two. match each sanskrit word to corresponding transliteration
 
 
