@@ -85,6 +85,18 @@ def get_versesV3():
         translit= pd.read_csv(r'Translit.csv')
         translit.columns=['chptverse','Translit']
 
+        #other data
+        # Gita_data = pd.read_json(r'LP_verses.json')
+        Gita_data = pd.read_json(r'LP_dataset_english.json')
+        # Gita_data['verses'][1]['1']['transliteration']
+        # with open(r'/gita_json-master/LP_dataset_english.json', encoding='utf-8') as f:
+        #      # Deserialises it
+        #      json_data = json.load(f)
+        #      f.close()
+
+        # #access transliteration
+        # Gita_data.iloc[0]['verses']['1']['transliteration']
+
         # Iterating through chapters to correct chapter names
         for i in range(1, 19):
              nm = 'chpt' + str(i) + 'V'
@@ -137,7 +149,7 @@ if __name__ == "__main__":
     for i in range(1, 19):
         print('Chapter {} has {} verses'.format(i,len(Sanskritverses[Sanskritverses['Chapter']==i])))
 
-    print(Sanskritverses[Sanskritverses['Chapter']==13])
+    # print(Sanskritverses[Sanskritverses['Chapter']==13])
     # print(BGdata['Sanskrit'])
     # # print(BGdata['Transliteration'][0])
     # BGdata.loc[BGdata['Chapter'] == 1, 'Transliteration'].iloc[0]

@@ -58,8 +58,8 @@ def get_data(selected_Url):
     # Verse_san=d.find('div', attrs={'id': 'originalVerse'}).text
     # Transliteration = d.find('div', attrs={'id': 'transliteration'}).text
 
-    Verse_san = d.find('div', attrs={'id': 'originalVerse'}).text
-    Transliteration = d.find('div', attrs={'id': 'transliteration'}).text
+    Verse_san = d.find('div', attrs={'id': 'originalVerse'}).get_text(separator = '\n', strip = True)
+    Transliteration = d.find('div', attrs={'id': 'transliteration'}).get_text(separator = '\n', strip = True)
     Translation2 = soup.find('div', attrs={'id': 'translation'})
     #Translation_text = soup.find('div', attrs={'id': 'translation'}).find_all(text=True)
     final_translation = Translation2.find('span').next_sibling.strip()
@@ -183,6 +183,12 @@ with requests.Session() as session:
         # chapter.verse_numbers = []
         verses[i] = {}
         page_no = 1
+        #################test single page
+        # idx = 3
+        # response = session.get(urls[idx])
+        # soup = BeautifulSoup(response.content, 'html.parser')
+        # Sans_meaning, verse = get_data(urls[idx])
+        #################test single page
         for idx, U in enumerate(urls):  # verses
             print(U)
             response = session.get(U)
@@ -195,10 +201,9 @@ with requests.Session() as session:
             else:
                 smallverse.append(processed_verse)
                 Sans_meaning, verse = get_data(U)
-
                 verse.verse_number = page_no  # comment for hindi
 
-                verses[i][str(page_no)] = {}
+                # verses[i][str(page_no)] = {}
                 verses[i][str(page_no)] = vars(verse)
                 page_no += 1
 
@@ -218,8 +223,11 @@ with requests.Session() as session:
 
 # Writing the data to json file
 # Change file name for different language
-data_file = open("LP_dataset_english.json", "w", encoding="utf-8")
-json.dump(data, data_file, ensure_ascii=False)
+# data_file = open("LP_dataset_english.json", "w", encoding="utf-8")
+# json.dump(data, data_file, ensure_ascii=False)
+
+with open('LP_dataset_english.json', 'w', encoding='utf8') as json_file:
+    json.dump(data, json_file, ensure_ascii=False)
 
 
 
