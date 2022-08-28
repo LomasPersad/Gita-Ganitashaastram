@@ -82,8 +82,8 @@ def get_versesV2():
 def get_versesV3():
          # sans_data = pd.read_csv('/home/ubuntu/Documents/Gita/Gita-Ganitashaastram/Sans.csv') #NVME drive
         sans_data = pd.read_csv('/home/ubuntu/Documents/Gita_Ganitashaastram.io/Sans.csv')  # USB drive
-        translit= pd.read_csv(r'Translit.csv')
-        translit.columns=['chptverse','Translit']
+        # translit= pd.read_csv(r'Translit.csv')
+        # translit.columns=['chptverse','Translit']
 
         #other data
         # Gita_data = pd.read_json(r'LP_verses.json')
@@ -103,7 +103,7 @@ def get_versesV3():
              new_nm = str(i)
              sans_data["chptverse"] = sans_data["chptverse"].str.replace("{}.*".format(nm), new_nm, case=False, regex=True)
 
-        big_data=pd.DataFrame(columns=['Chapter','Verse','Sanskrit'])
+        big_data=pd.DataFrame(columns=['Chapter','Verse','Sanskrit','Translit'])
         # Iterate for each chapter
         for i in range(1, 19):
             chpt_nm= str(i)
@@ -117,11 +117,12 @@ def get_versesV3():
             # Create Chapter DataFrame
             df = pd.DataFrame(data)
             df["Chapter"]=int(chpt_nm)
+            # Work on transliteration
+            translit_df=get_translit(Gita_data, i)
+            df['Translit']=translit_df
 
             # big_data=big_data.append(df)  # create new mega list
             big_data=pd.concat([big_data,df])
-
-        # Work on transliteration
 
 
         return big_data
@@ -140,7 +141,25 @@ def clean_chpt(Sans_data_chpt):
 
     # BG_total.to_csv('BG_dataframev2_organized.csv')
 
+def get_translit(Gita_data,i):
+    translit_verses = []
+    for v in Gita_data['verses'][i]:
+            chpt_translit = Gita_data['verses'][i][v]['transliteration']
+            # chpt_translit=chpt_translit.replace("?(\R)", '', case=False, regex=True)
+            result = re.sub(r"uvācha\n", 'uvācha:', chpt_translit)
+            translit_verses.append(result)
 
+    regular_list = '\n'.join(translit_verses)
+    # all_verses=regular_list.strip()
+    individ_lines = re.split('\n', regular_list)
+    # group two lines together
+    grp_verses = []
+    for i in range(0, len(individ_lines), 2):
+        verse = individ_lines[i] + ',' + individ_lines[i + 1]
+        grp_verses.append(verse)
+        # print(verse)
+    translit_df = pd.DataFrame(grp_verses)
+    return translit_df
 
 if __name__ == "__main__":
     #-----------------------main code
@@ -150,6 +169,7 @@ if __name__ == "__main__":
         print('Chapter {} has {} verses'.format(i,len(Sanskritverses[Sanskritverses['Chapter']==i])))
 
     # print(Sanskritverses[Sanskritverses['Chapter']==13])
+    # Sanskritverses[(Sanskritverses['Chapter'] == 13) & (Sanskritverses['Verse'] == 13)]
     # print(BGdata['Sanskrit'])
     # # print(BGdata['Transliteration'][0])
     # BGdata.loc[BGdata['Chapter'] == 1, 'Transliteration'].iloc[0]
